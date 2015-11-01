@@ -2,7 +2,7 @@
 
 The `primitive` mechanism is used by flex and bison to associate a trait's result to a langauge specific primitive.
 
-For example, the bool trait should return a boolean primitive. In the c lanauge, this will be `char` and in cpp this will be `bool`.
+For example, the bool trait should return a boolean primitive. In the *C lanauge*, this will be `char` and in *C++* this will be `bool`.
 
 The resulting mechanism looks like this:
 
@@ -23,7 +23,7 @@ primitive: [
 ]
 ```
 
-Another approach is to associate define primitives using a trait:
+Another approach is to define primitives using a trait:
 
 ```c
 bool: [
@@ -60,7 +60,7 @@ true: [
 ]
 ```
 
-The bool trait is defined to return a `char` in c and bool in cpp.
+The bool trait is defined to return a `char` in *C* and bool in *C++*.
 
 The statement:
 
@@ -68,13 +68,13 @@ The statement:
 x = true.bool;
 ```
 
-becomes the following in c:
+becomes the following in *C*:
 
 ```c
 char x = 1;
 ```
 
-and the following for c++:
+and the following in *C++*:
 
 ```cpp
 bool x = true;
@@ -88,15 +88,15 @@ false: [
 	char: { 'f' },
 	str: "false"
 ]
-```c
+```
 
-Of course, we could define other langauges too like java, ruby, etc.
+Of course, we could define primitives for other langauges too like java, ruby, etc.
 
 # The Boolean Primitive
 
 We still need to define the boolean primitive itself in mech lang.
 
-```
+```c
 bool: [
 	(value): {},
 	value: { this.value },
@@ -107,7 +107,7 @@ bool: [
 
 
 
-
+```c
 // Greater Than or Equal To
 >=: [
 	left: {},
@@ -119,7 +119,10 @@ bool: [
 		c { left.bool >= right.bool }
 	]
 ]
+```
 
+
+```c
 // Value equality (not instance equals)
 ==: [
 	left: {},
@@ -131,7 +134,9 @@ bool: [
 		c { left.bool == right.bool }
 	]
 ]
+```
 
+```c
 // Between
 ..: [
 	(value) : {}
@@ -141,7 +146,9 @@ bool: [
 		left >= value && right <= value
 	}
 ]
+```
 
+```c
 // http://www.fileformat.info/info/unicode/category/Ll/list.htm
 char: [
 	(value): {},
@@ -153,27 +160,36 @@ char: [
 		}
 	}
 ]
+```
 
+```c
 mech: [
 	is_empty: false
 ]
+```
 
+```c
 empty: [
 	is_empty: true,
 	bool: { -128 },
 	char: { -128 }
 ]
+```
 
+```c
 // Trait operates against 'value'
 is_lower [
 	bool: {
 
 	}
 ]
+```
 
+```c
 char: [
 	char: { value },
 ]
+```
 
 
 // http://www.tutorialspoint.com/cprogramming/c_data_types.htm
