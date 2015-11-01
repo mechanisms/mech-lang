@@ -1,0 +1,168 @@
+// Final "fall-back" block scope and mech mechanism definition.
+mech [
+	primitive: false,
+	convert_using_base: 10
+]
+
+// The string primitive
+string [
+	primitive: true,
+	type: [
+		cpp { std:string },
+		c { char* },
+		ml { ???? }
+	]
+]
+
+chr [
+	(value): {},
+	str: {  }
+]
+
+
+
+
+
+
+
+
+
+str_to [
+	l64: {
+
+		result = 0;
+		is_negative = false;
+		emitter = value;
+		position = 0;
+
+		loop {
+			value_now.byte ?
+				45: {
+					is_negative = true;
+				}
+				48..57: {
+					position++;
+					result += ( vale_now.byte_peek - 48 ) * position;
+				}
+		}
+
+		is_negative ? -result : result; // return if negative
+
+	},
+	i64: [
+		cpp {
+			return std:stoi(value.s64, convert_using_base.i64); // http://www.cplusplus.com/reference/string/stoi/
+			// return std::stol(value.s64, convert_using_base.i64); // http://www.cplusplus.com/reference/string/stol/
+
+		},
+		c {
+			return strtol(value.s64, null, convert_using_base.i64); // http://www.tutorialspoint.com/c_standard_library/c_function_strtol.htm
+			return strtol(value.s64, null, convert_using_base.i64); // http://www.tutorialspoint.com/c_standard_library/c_function_strtol.htm
+		},
+		asym {
+			// assembly
+		},
+		ml {
+			// mech-lang specific
+			// GOAL is to have ml {} completed.
+		}
+	]
+]
+
+str_emit [
+	(value): {},
+	current: 0,
+	reset: { current = 0; },
+	peek: {
+
+	}
+	byte: {
+
+	}
+
+
+]
+
+// String primitive
+str [
+	(value): {},
+	value: { string },
+	s64: { value },
+	l64: str_to.l64,
+	i64: str_to.i64
+]
+
+// Definition of pi
+pi [
+	f64: { 3.141592653 },
+	i64: { 3 },
+	l64: { 3 },
+	s64: { "3.141592653" },
+	vf64: { [f64] },
+	vi64: { [i64] },
+	vs64: { [s64] }
+]
+
+// Definition of pi*pi
+pisqr [
+	f64: { pi.f64 * 2 },
+	i64: { pi.i64 * 2 },
+	s64: { "3.141592653" },
+	vf64: { [pi.f64 * 2] },
+	vi64: { [pi.i64 * 2] },
+	vs64: { [pi.s64 * 2] }
+]
+
+
+i64 [
+	primitive: long long,
+	max_value: +9223372036854775806,
+	min_value: −9223372036854775806,
+	value: max_value,
+	i64: cpp_lang { value; },
+	i64.set: cpp_lang { ???? },
+	f64: cpp_lang { (float)value; },
+	s64: cpp_lang { std::to_string(value); }
+]
+
+// maps to
+
+	long long i64_max_value = 45;
+	long long i64_min_value = -45;
+	long long i64_i64(i64_struct this, long long value) {
+		return value;
+	}
+	float i64_f64(i64_struct this, long long value) {
+		return (float)this->value;	
+	}
+	string i64_s64(i64_struct this, long long value) {
+		return std::to_string(this->value);
+	}
+
+f64 {
+	...
+}
+
+
+sqrt {
+	value:,
+	i64: cpp_lang { sqrt(value.i64); },
+	f64: cpp_lang { sqrt(value.f64); },
+}
+
+// maps to ?????
+
+// LETTER_ALL     [^0-9\s{}\.:]
+// LETTER_NUM     [^\s{}\.:]
+// IDENT2         ({LETTER_ALL}({LETTER_NUM})*)
+
+
+// print:
+// 	echo $(wildcard *.c)
+// 	echo $(patsubst %.c,%.o,$(wildcard *.c))
+// 	echo $(objects)
+
+// test1: $(EXE) test1.mec
+// 	./^ test1
+// 	./test >test1.results
+// 	diff test1.results test1.expected || exit 1
