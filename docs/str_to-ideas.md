@@ -22,8 +22,8 @@ emit: [
 
 Things to note:
 
-- The emitter doesn't need to worry about bounds checking. The value primitive will manage that for us by returning value.empty.
-- We are able to emit on any primitive data type: byte, char, string, i64, etc. As such, we only need to define this **one** emitter.
+- The emitter doesn't need to worry about bounds checking. The primitive instance in `value` will manage that for us by returning `value.empty`.
+- We are able to emit on any primitive data type: `byte`, `char`, `string`, `i64`, etc. As such, we only need to define this **one** emitter.
 - For any given primitive data type, we know it's empty value using `value.empty`. As such, we know we've finished emitting when `value[position] == value.empty;`.
 
 We can use that emitter in conjunction with a loop to stream through the bytes.
@@ -36,23 +36,37 @@ str_to: [
 	(emitter): { emit(value) },
 	l64: {
 		// ??? emitter.reset; // just in case we run str_to more than once.
-		loop (emitter.byte) {
+		loop (emitter, {
 			case(emitter.byte) [
 				45: { is_negative = true; },
-				48..57: { result += ( emitter.byte - 48 ) * emitter.position; },
-				default: { break; }
+				48..57: { result += ( emitter.byte - 48 ) * emitter.position * 10; },
+				default: { loop.break; }
 			]
-			emitter.next;
-		}
+		})
 		is_negative.bool ? -result : result;
 	}
 ]
 ```
 
-A loop will continue until the emitter returns true for `at_end`.
+A loop will:
+
+- Automatically call `emitter.next` at the end of scope.
+- Continue until the emitter returns true for `at_end`.
+
+```c
+loop: [
+	(emitter): {},
+	(algorithm): {},
+	mech: {
+		if (!emitter.at_end) {
+			algorithm.mech;
+			emitter.next;
+		}
+	}
+]
+```
 
 Let's use str_to to define our primitive data type.
-
 
 ```c
 str: [
@@ -73,9 +87,6 @@ str: [
 	i64: { str_to(value).i64; }
 ]
 ```
-
-
-
 
 ## Language Specific
 
