@@ -40,7 +40,7 @@ str_to: [
 			case(emitter.byte) [
 				45: { is_negative = true; },
 				48..57: { result += ( emitter.byte - 48 ) * emitter.position * 10; },
-				default: { loop.break; }
+				default: { break; }
 			]
 		})
 		is_negative.bool ? -result : result;
@@ -54,14 +54,16 @@ A loop will:
 - Continue until the emitter returns true for `at_end`.
 
 ```c
-loop: [
-	(emitter): {},
-	(algorithm): {},
+loop(emitter,algorithm): [
+	(break): { false },
 	mech: {
-		if (!emitter.at_end) {
+		if (break && !emitter.at_end) {
 			algorithm.mech;
 			emitter.next;
 		}
+	},
+	break: {
+		break = true;
 	}
 ]
 ```
