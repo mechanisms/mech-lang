@@ -27,13 +27,13 @@ $(BIN_DIR)/$(EXEC): $(GENOBJ)
 $(GENOBJ): %.o: $(GENSRC)
 	$(CC) -c -std=gnu++11 -I${INC_DIR} $< -o $@
 
-# Use flex to generate lex.yy.c.
-$(TMP_DIR)/lex.yy.c: mech-lang.l $(TMP_DIR)/mech-grammar.cpp
-	flex mech-lang.l
+# Use flex to generate mech-scanner.cpp
+$(TMP_DIR)/mech-scanner.cpp: mech-scanner.l $(TMP_DIR)/mech-grammar.cpp
+	flex mech-scanner.l
 
-# Use bison to generate mech-lang.tab.h used by Flex
+# Use bison to generate mech-grammar.h used by Flex
 $(TMP_DIR)/mech-grammar.cpp: mech-grammar.y parser.h
-	bison -d mech-grammar.y --output=$@
+	bison -d mech-grammar.y --defines=$(TMP_DIR)/mech-grammar.h --output=$@
 
 clean:
 	rm $(TMP_DIR)/* $(BIN_DIR)/*

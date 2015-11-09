@@ -4,14 +4,14 @@
 using namespace std;
 #define YY_DECL extern "C" int yylex()
 
-#include "mech-lang.tab.h"  // to get the token types that we return
+#include "mech-grammar.h"  // to get the token types that we return
 %}
 %option 8bit
 %option nodefault
 %option nounput
 %option noyywrap
 %option warn
-%option outfile="tmp/lex.yy.c"
+%option outfile="tmp/mech-scanner.cpp"
 %%
 [ \t\n]           { ; }
 [0-9]+\.[0-9]+    { yylval.fval = atof(yytext); return FLOAT; }
