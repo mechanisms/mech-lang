@@ -1,39 +1,53 @@
-CC      := g++
+# Kevin Albert | kaalbert@ucsc.edu
+# Eric Hosick  | erichosick@gmail.com
+
+INC_DIR	:= include/
+SRC_DIR	:= src/
+BLD_DIR	:= build/
+BIN_DIR := bin/
+
+CC		:= g++
 CFLAGS	:= -Ofast -c -std=c++11 -Wextra -Wall
 LDFLAGS	:= -std=c++11 -Wextra -Wall
-EXEC    := mech-lang
+SRC		:= test.cpp mech-parser.cpp parse_context.cpp ast.cpp
+SRCS_DR := $(addprefix $(SRC_DIR)/,$(SRC))
+HEADERS	:= mech-parser.h
+OBJ		:= $(SRC:.cpp=.o)
+OBJ_DR  := $(addprefix $(BLD_DIR), $(OBJ))
+GENSRC	:= mech-grammar.cpp mech-scanner.cpp
+GENOBJ	:= $(GENSRC:.cpp=.o)
+GENO_DR := $(addprefix $(BLD_DIR), $(GENOBJ))
+EXE		:= $(BIN_DIR)mech
 
-INC_DIR	:= inc
-SRC_DIR	:= src
-OBJ_DIR	:= obj
-TMP_DIR := tmp
-BIN_DIR := bin
+vpath %.h   ${INC_DIR}
+vpath %.cpp ${SRC_DIR}
+vpath %.o   ${BLD_DIR}
 
-GENSRC	:= $(TMP_DIR)/lex.yy.c $(TMP_DIR)/mech-lang.tab.c
-GENOBJ	:= $(GENSRC:.c=.o)
+$(EXE): $(OBJ) $(GENOBJ)
+	$(CC) -I $(INC_DIR) -I $(SRC_DIR) -I . -I $(BLD_DIR) $(LDFLAGS) $(GENO_DR) $(OBJ_DR) -o $(EXE)
 
-vpath %.h ${INC_DIR}:${TMP_DIR}
-vpath %.cpp ${SRC_DIR}:${TMP_DIR}
-vpath %.obj ${OBJ_DIR}
+$(OBJ): %.o: %.cpp $(GENSRC) 
+	$(CC) -I $(INC_DIR) -I $(SRC_DIR) -I . -I $(BLD_DIR) $(CFLAGS) $< -o $(BLD_DIR)$@ 
 
-run: Makefile $(BIN_DIR)/$(EXEC)
+$(GENOBJ): %.o: %.cpp mech-grammar.h 
+	$(CC) -I $(INC_DIR) -I $(SRC_DIR) -I . -I $(BLD_DIR) -c -std=gnu++11 $(BLD_DIR)$< -o $(BLD_DIR)$@
 
-# $(BIN_DIR)/$(EXEC): $(TMP_DIR)/lex.yy.c
-# 	$(CC) $(TMP_DIR)/lex.yy.c $(TMP_DIR)/mech-lang.tab.c -ll -o $(BIN_DIR)/$(EXEC)
+mech-scanner.cpp: scanner.cpp.messy
+	sed 's|register ||' <$(BLD_DIR)scanner.cpp.messy >$(BLD_DIR)mech-scanner.cpp
 
-$(BIN_DIR)/$(EXEC): $(GENOBJ)
-	$(CC) $(LDFLAGS) -I${INC_DIR} $^ -o $(EXE)
+scanner.cpp.messy: mech-scanner.l mech-grammar.h mech-parser.h
+	flex --outfile=$(BLD_DIR)$@ $< 2>/dev/null
 
-$(GENOBJ): %.o: $(GENSRC)
-	$(CC) -c -std=gnu++11 -I${INC_DIR} $< -o $@
+# Makefile.deps: mech-grammar.h
+# 	g++ -I $(INC_DIR) -I $(SRC_DIR) -I. -MM $(SRCS_DR) >$@
 
-# Use flex to generate mech-scanner.cpp
-$(TMP_DIR)/mech-scanner.cpp: mech-scanner.l $(TMP_DIR)/mech-grammar.cpp
-	flex mech-scanner.l
+mech-grammar.h: mech-grammar.cpp
 
-# Use bison to generate mech-grammar.h used by Flex
-$(TMP_DIR)/mech-grammar.cpp: mech-grammar.y parser.h
-	bison -d mech-grammar.y --defines=$(TMP_DIR)/mech-grammar.h --output=$@
+mech-grammar.cpp: mech-grammar.y mech-parser.h
+	bison --defines=$(BLD_DIR)mech-grammar.h --output=$(BLD_DIR)$@ $<
+
+# include Makefile.deps
 
 clean:
-	rm $(TMP_DIR)/* $(BIN_DIR)/*
+	rm -f $(EXE) $(BLD_DIR)*.o 
+#   Makefile.deps

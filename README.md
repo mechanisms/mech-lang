@@ -88,9 +88,19 @@ You can also use an evaluation mechansism.
     - Notice we pass the `i64_two` mechanism instance to the evaluator to invoke the mechanism.
 - **Note:** Evaluation mechanisms do not use lazy evaluation. They invoke as soon as you use them.
 
+
+## Decisions
+
+- [Project Structure][project-structure]: Looked good enough
+- [][] - Use markdown for documentation.
+
 [lazy_evaluation]: https://en.wikipedia.org/wiki/Lazy_evaluation
 [flex_and_bison]: http://aquamentus.com/flex_bison.html
 [makefile-intro]: https://www.youtube.com/watch?v=aw9wHbFTnAQ
 [makefile-gnu]: https://www.gnu.org/software/make/manual/make.html
 [makefile-learn]: https://github.com/mechanisms/makefile-learn
+
+[project-structure]: http://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/
+
+
 

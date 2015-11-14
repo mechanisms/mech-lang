@@ -1,67 +1,69 @@
 %{
-#include <cstdio>
+
+#include <string>
 #include <iostream>
 using namespace std;
 
-// stuff from flex that bison needs to know about:
-extern "C" int yylex();
-extern "C" int yyparse();
-extern "C" FILE *yyin;
- 
-void yyerror(const char *s);
+#include "mech-parser.h"
+
 %}
 
-// Bison fundamentally works by asking flex to get the next token, which it
-// returns as an object of type "yystype".  But tokens could be of any
-// arbitrary data type!  So we deal with that in Bison by defining a C union
-// holding each of the types of tokens that Flex could return, and have Bison
-// use that union instead of "int" for the definition of "yystype":
-%union {
-   int ival;
-   float fval;
-   char *sval;
-}
+%debug
+%defines
+%error-verbose
+%token-table
+%verbose
 
-// define the "terminal symbol" token types I'm going to use (in CAPS
-// by convention), and associate each with a field of the union:
-%token <ival> INT
-%token <fval> FLOAT
-%token <sval> STRING
+%token T_BLOCK
+%token T_IDENT T_I32 T_F32 
+%token T_INTCON T_FLOATCON
+ 
+%token T_ROOT T_MECH T_TRAIT T_TRAITS
+%token T_ERR
+
+%right '='
+%left '<' '>' T_GTEQ T_LTEQ T_EQ T_NEQ
+%left T_SL T_SR
+%left '+' '-'
+%left '*' '/' '%'
+%right T_POS T_NEG '!'
+%left '[' '.'
+%left '('
+
+%start program
 
 %%
-// this is the actual grammar that bison will parse, but for right now it's just
-// something silly to echo to the screen what bison gets from flex.  We'll
-// make a real one shortly:
-mech:
-   INT mech      { cout << "bison found an int: " << $1 << endl; }
-   | FLOAT mech  { cout << "bison found a float: " << $1 << endl; }
-   | STRING mech { cout << "bison found a string: " << $1 << endl; }
-   | INT            { cout << "bison found an int: " << $1 << endl; }
-   | FLOAT          { cout << "bison found a float: " << $1 << endl; }
-   | STRING         { cout << "bison found a string: " << $1 << endl; }
-   ;
+
+program     : mech                      { set_parse_root($1); }
+            ;
+
+mech        : '{' traits '}'            { $$ = buildv($1, T_MECH, $2); }
+            | '{' traits ';' '}'        { $$ = buildv($1, T_MECH, $2); }
+            | '{' '}'                   { $$ = buildv($1, T_MECH); }
+            ;
+
+traits      : traits ';' trait          { adopt($1, $3); }
+            | traits error ';'          { parse_error($2); $$ = $1; }
+            | trait                     { $$ = buildv($1, T_TRAITS, $1); }
+            ;
+
+trait       : '.' tname ':' expr        { $$ = buildv($1, T_TRAIT, $2, $4); }
+            ;
+
+tname       : T_IDENT
+            | T_I32
+            | T_F32
+            ;
+
+expr        : con                       {  }
+            ;
+
+con         : T_INTCON                  {  }
+            | T_FLOATCON                {  }
+            ;
 %%
 
-int main(int, char**) {
-   // open a file handle to a particular file:
-   FILE *myfile = fopen("example001.mech.md", "r");
-   // make sure it is valid:
-   if (!myfile) {
-      cout << "I can't open example001.mech.md!" << endl;
-      return -1;
-   }
-   // set flex to read from it instead of defaulting to STDIN:
-   yyin = myfile;
-   
-   // parse through the input until there is no more:
-   do {
-      yyparse();
-   } while (!feof(yyin));
-   
+string yy_name(int code) {
+    return yytname[YYTRANSLATE(code)];
 }
 
-void yyerror(const char *s) {
-   cout << "EEK, parse error!  Message: " << s << endl;
-   // might as well halt now:
-   exit(-1);
-}

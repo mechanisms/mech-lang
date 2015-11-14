@@ -1,28 +1,62 @@
 %{
-#include <cstdio>
-#include <iostream>
-using namespace std;
-#define YY_DECL extern "C" int yylex()
 
-#include "mech-grammar.h"  // to get the token types that we return
+#include <string>
+using namespace std;
+#include "mech-parser.h"
+#include "mech-grammar.h"
+
+#define YY_USER_ACTION scanner_useraction();
+
 %}
+
 %option 8bit
+%option debug
 %option nodefault
 %option nounput
 %option noyywrap
+%option verbose
 %option warn
-%option outfile="tmp/mech-scanner.cpp"
-%%
-[ \t\n]           { ; }
-[0-9]+\.[0-9]+    { yylval.fval = atof(yytext); return FLOAT; }
-[0-9]+            { yylval.ival = atoi(yytext); return INT; }
-[^0-9{}()`:\n ]+  {
-					// we have to copy because we can't rely on yytext not changing underneath us:
-					yylval.sval = strdup(yytext);
-					return STRING;
-				  }
-.                 { ; }
+
+LETTER         [A-Za-z_]
+DIGIT          [0-9]
+INT			   {DIGIT}+
+FLOAT          ({DIGIT}+(\.{DIGIT}+)?)|(\.?{DIGIT}+)
+IDENT          ({LETTER}({LETTER}|{DIGIT}|_)*)
+
 %%
 
-// %option debug
-// %option verbose
+
+[ \t]+         { /* whitespace */ }
+\n             { scanner_newline(); }
+"i32"          { return scan_token(T_I32); }
+"f32"          { return scan_token(T_F32); }
+{INT}		   { return scan_token(T_INTCON); }
+{FLOAT}        { return scan_token(T_FLOATCON); }
+{IDENT}        { return scan_token(T_IDENT); }
+"=="           { return scan_token(T_EQ); }
+"!="           { return scan_token(T_NEQ); }
+">="           { return scan_token(T_GTEQ); }
+"<="           { return scan_token(T_LTEQ); }
+">"            { return scan_token('>'); }
+"<"            { return scan_token('<'); }
+"="            { return scan_token('='); }
+"+"            { return scan_token('+'); }
+"-"            { return scan_token('-'); }
+"*"            { return scan_token('*'); }
+"/"            { return scan_token('/'); }
+"%"            { return scan_token('%'); }
+"!"            { return scan_token('!'); }
+"("            { return scan_token('('); }
+")"            { return scan_token(')'); }
+"{"            { return scan_token('{'); }
+"}"            { return scan_token('}'); }
+"."            { return scan_token('.'); }
+"["            { return scan_token('['); }
+"]"            { return scan_token(']'); }
+"."            { return scan_token('.'); }
+";"            { return scan_token(';'); }
+"|"            { return scan_token('|'); }
+":"            { return scan_token(':'); }
+.              { return bad_token("illegal token", ';'); }
+
+%%
