@@ -103,4 +103,71 @@ You can also use an evaluation mechansism.
 [project-structure]: http://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/
 
 
+Mech langauge code:
+
+
+```
+{
+  a = 4;
+  b = 2;
+  while (b != 0) {
+    if (a > b) {
+      a = a − b;
+    } else {
+      b = b − a;
+    }
+  }
+  return a
+}
+```
+
+becomes and AST-ish output that is "runnable"???
+
+```
+scope(
+    [a(4)],
+    scope(
+        [b(2)],
+        while (
+            not (
+                equal(b, 0)
+            ),
+            ifelse (
+                gt(a,b),
+                assign(a, sub(a,b)),
+                assign(b, sub(b,a))
+            )
+        )
+    )
+)
+```
+
+compiled to C
+
+```
+{
+    a = 4;
+    {
+        b = 2;
+        while b != 0 {
+            if ( a > b ) {
+                a = a - b;
+            } else {
+                b = b - a;
+            }
+        }
+    }
+}
+```
+
+or maybe we solve it?
+
+```
+    a = 2;
+```
+
+
+
+
+
 
