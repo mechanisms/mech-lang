@@ -150,19 +150,4 @@ sqrt {
 	f64: cpp_lang { sqrt(value.f64); },
 }
 
-// maps to ?????
 
-// LETTER_ALL     [^0-9\s{}\.:]
-// LETTER_NUM     [^\s{}\.:]
-// IDENT2         ({LETTER_ALL}({LETTER_NUM})*)
-
-
-// print:
-// 	echo $(wildcard *.c)
-// 	echo $(patsubst %.c,%.o,$(wildcard *.c))
-// 	echo $(objects)
-
-// test1: $(EXE) test1.mec
-// 	./^ test1
-// 	./test >test1.results
-// 	diff test1.results test1.expected || exit 1
