@@ -1,6 +1,6 @@
 # Primitives
 
-The `primitive` mechanism is used by flex and bison to associate a trait's result to a langauge specific primitive.
+The `primitive` mechanism is used by flex and bison to associate a trait's result to a language specific primitive.
 
 For example, the bool trait should return a boolean primitive. In the *C lanauge*, this will be `char` and in *C++* this will be `bool`.
 
@@ -50,7 +50,7 @@ str: [
 
 ## Example Using true
 
-`true` is a mechanism used to define true in multiple primitive datatypes. 
+`true` is a mechanism used to define true in multiple primitive datatypes.
 
 ```c
 true: [
@@ -62,7 +62,7 @@ true: [
 
 The bool trait is defined to return a `char` in *C* and bool in *C++*.
 
-The statement:
+The mech-lang statement:
 
 ```c
 x = true.bool;
@@ -90,7 +90,7 @@ false: [
 ]
 ```
 
-Of course, we could define primitives for other langauges too like java, ruby, etc.
+Of course, we could define primitives for other languages too like java, ruby, etc.
 
 # The Boolean Primitive
 
