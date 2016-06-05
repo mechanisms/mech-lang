@@ -64,6 +64,17 @@ The code body of the constructor is empty in the ```emit``` mechanism but can co
 
 The syntax for a trait is ```trait_02: { code body },```.
 
+### Inheritance
+
+```js
+dog : tail, bark [
+	...
+]
+```
+
+Note that mechanisms support multiple inheritance.
+
+
 ### Native Language Template Traits
 
 Where the rubber meets the road, we provide native language templates. They are declared similar to a trait but require the ```[]```.
@@ -82,6 +93,6 @@ Where the rubber meets the road, we provide native language templates. They are 
 ]
 ```
 
-This embedded code is used by the compiler to generate the native language code. Note that **most** mechanisms will not have imbedded language code.
+This embedded code is used by the compiler to generate the native language code. Note that **most** mechanisms will not have imbedded language code. In fact, a huge majority of mech-lang developers should not have to code mechanisms with native language template traits.
 
 The mechanism interpreter ignores the code contained within the *_lang syntax and simply passes it to the compiler.
