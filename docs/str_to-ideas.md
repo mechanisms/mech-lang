@@ -28,14 +28,13 @@ Things to note:
 
 We can use that emitter in conjunction with a loop to stream through the bytes.
 
-the l64 trait for str_to converts a string into a long 64 value. Note that `loop` and `case` are also mechaisms.
+the l64 trait for str_to converts a string into a long 64 value. Note that `loop` and `case` are also mechanisms.
 
 ```c
 str_to: [
-	(value): {},
+	(value): { emitter = emit(value) },
 	(result): {},
 	(is_negative): { false },
-	(emitter): { emit(value) },
 	l64: {
 		// ??? emitter.reset; // just in case we run str_to more than once.
 		loop (emitter, {
